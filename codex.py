@@ -1,12 +1,13 @@
-
-
 from sklearn import svm
 import multiprocessing
 import pickle
 from os.path import join
 import re, os
 
+import numpy as np
+
 import enum
+import gzip
 
 def register_feature(pattern):
     flags = re.MULTILINE | re.DOTALL
@@ -171,35 +172,41 @@ def preprocess(text):
 class Classifier:
     def __init__(self, dataset=None):
         if not dataset:
+            self.vectors = np.empty((0, len(MARKERS)), float)
+            self.classes = np.empty((0,), str)
             self.markers = MARKERS
             self.classif = None
-            self.vectors = []
-            self.classes = []
         else:
             with open(dataset, 'rb') as datafile:
                 self.markers,\
                 self.vectors,\
                 self.classes,\
-                self.classif = pickle.load(datafile)
+                self.classif = pickle.loads(gzip.decompress(datafile.read()))
 
 
     def classify(self, text, threshold=0.2):
         if self.classif is None:
             raise ValueError("Classifier not trained.")
 
-        preprocessed_text = preprocess(text)
-        weights = [metric(marker, preprocessed_text) for marker in self.markers]
-        print("{0:.3f}".format(sum(weights)))  # TODO: debugging
-        return Language(self.classif.predict([weights])[0]) if sum(weights) >= threshold else None
+        preprocessed = preprocess(text)
+        weights = [metric(marker, preprocessed) for marker in self.markers]
+
+        if sum(weights) >= threshold:
+            return Language(self.classif.predict([weights])[0])
+        else:
+            return None
 
 
     def train(self, texts, languages):
+        vectors = []
+
         # TODO: parallelize this later
         for text in texts:
             preprocessed_text = preprocess(text)
-            self.vectors.append([metric(m, preprocessed_text) for m in self.markers])
+            vectors.append([metric(m, preprocessed_text) for m in self.markers])
 
-        self.classes += [lang.value for lang in languages]
+        self.vectors = np.append(self.vectors, vectors, axis=0)
+        self.classes = np.append(self.classes, [lang.value for lang in languages], axis=0)
 
         self.classif = svm.LinearSVC(class_weight='balanced', multi_class='crammer_singer')
         self.classif.fit(self.vectors, self.classes)  # train the classifier on the dataset
@@ -207,10 +214,9 @@ class Classifier:
 
     def save(self, dataset):
         with open(dataset, 'wb') as datafile:
-            pickle.dump((self.markers,
-                         self.vectors,
-                         self.classes,
-                         self.classif), datafile, 3)
+            datafile.write(gzip.compress(pickle.dumps((
+                self.markers, self.vectors,\
+                self.classes, self.classif))))
 
 
 """ Training helper functions """
