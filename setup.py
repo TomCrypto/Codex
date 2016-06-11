@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from distutils.core import setup, find_packages
+from setuptools import setup, find_packages
 
 setup(
     name='Codex',

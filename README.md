@@ -3,6 +3,8 @@ Codex - Source code language classification
 
 This small library is an attempt to classify source code using a support vector machine (SVM) classifier.
 
+It doesn't work very well currently but is still in development.
+
 Usage
 -----
 
