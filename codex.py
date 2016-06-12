@@ -73,6 +73,33 @@ MARKERS = [
     _compiled_regex(r"'(.*?)'\s+%\s+(.*?)$", dotall=False),
     _compiled_regex(r'^\s*raise\s+\w+Error(.*?)$'),
 
+    # Haskell markers
+    _compiled_regex(r'let\s+\w+\s*='),
+    _compiled_regex(r'::\s+\w+\s+->'),
+    _compiled_regex(r'>>='),
+    _compiled_regex(r'^\s*import(\s+qualified)?\s+[\.\w]+(\s*\((.*?))?$'),
+    _compiled_regex(r'^\s*module\s+[\.\w]+(.*?)where$'),
+    _compiled_regex(r'^\s*{-#(.*?)#-}'),
+    _compiled_regex(r'^\s*\w+\s*::(.*?)$'),
+    _compiled_regex(r'->\s*\[?[\w]+\]?'),
+    _compiled_regex(r'\w+\s*<-\s*\w+'),
+    _compiled_regex(r'\w+\s+\$\s+\w+'),
+    _compiled_regex(r'\(\w+::\w+\)'),
+    _compiled_regex(r"\w+'"),
+    _compiled_regex(r'<\$>'),
+    _compiled_regex(r'=>'),
+    _compiled_regex(r'^\s*instance\s+\w+\s+\w+=>(.*?)where$'),
+    _compiled_regex(r'^(.*?)=\s+do$', dotall=False),
+    _compiled_regex(r'\+\+'),
+    _compiled_regex(r'where$'),
+    _compiled_regex(r'^\s*\|\s+\w+(.*?)=(.*?)$'),
+
+
+
+
+
+
+
     # TODO: everything below needs to be reviewed
 
     _compiled_regex(r'^module'),
@@ -147,11 +174,6 @@ MARKERS = [
     _compiled_regex(r'\s.function\s+\w+\('),
     _compiled_regex(r'\.length'),
     _compiled_regex(r'require\s+\(' + '(\'|")\)'),
-
-    # Haskell markers
-    _compiled_regex(r'let\s+\w+\s*='),
-    _compiled_regex(r'::\s+\w+\s+->'),
-    _compiled_regex(r'>>='),
 
     # Preprocessor markers
     _compiled_regex(r'^\s*#include (<|")'),
@@ -362,6 +384,8 @@ def _load_dataset(dataset):
 
 def _train_classifier(train_path, threshold):
     elements = []
+
+    classifier = Classifier(threshold=threshold)
 
     for lang, files in _load_dataset(train_path).items():
         for path in files:
