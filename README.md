@@ -85,4 +85,4 @@ There is a special case where such constructs can lead to severe ambiguity betwe
 
   * `{...}`: Block comment in Delphi, compound statement in C-like languages
 
-As a general rule, misclassifying the input as the wrong language is preferable to mistakenly detecting normal text as code and vice versa, whenever possible (which is why the threshold value needs to be carefully tuned).
+As a general rule, misclassifying the input as the wrong language is preferable to mistakenly detecting normal text as code and vice versa, whenever possible (which is why the threshold value needs to be carefully tuned according to your dataset).
