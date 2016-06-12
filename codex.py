@@ -17,7 +17,7 @@ MARKERS = [
     _compiled_regex(r'^\s{2,}\S'), # indentation
 
     # TODO: need to explain what is going on here as it's not obvious
-    _compiled_regex(r'.{,2}\s*[=/\*-\+\|<\{\}\[\](\)~`_\^;#]+\s*.{,2}'),  # generic symbol capture
+    _compiled_regex(r'.{,2}\s*[=/\-\+\|<\{\}\[\](\)~`_\^;#]+\s*.{,2}'),  # generic symbol capture
 
     # C preprocessor markers
 
@@ -204,7 +204,7 @@ MARKERS = [
     _compiled_regex(r'throw new \w+\((.*?)\);\s*$'),
 
     # C/C++ markers
-    _compiled_regex(r'\w+\s*\*\s*[a-zA-Z_]\w+'),
+    #_compiled_regex(r'\w+\s*\*\s*[a-zA-Z_]\w+'),
     _compiled_regex(r'{$'),
     _compiled_regex(r'^\s*}'),
     _compiled_regex(r'^\s*};'),
