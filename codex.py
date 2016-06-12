@@ -345,8 +345,7 @@ import os.path
 import os
 
 
-# TODO: improve
-def load_dataset(dataset):
+def _load_dataset(dataset):
     files = {}
 
     for l in [l for l in os.listdir(dataset) if os.path.isdir(os.path.join(dataset, l))]:
@@ -355,20 +354,40 @@ def load_dataset(dataset):
     return files
 
 
-# TODO: improve
-def generate_classifier(dataset, threshold):
-    classifier = Classifier(threshold=threshold)
-
+def _train_classifier(train_path, threshold):
     elements = []
 
-    for lang, files in load_dataset(dataset).items():
+    for lang, files in _load_dataset(train_path).items():
         for path in files:
             with open(path, 'r', encoding='utf-8', errors='ignore') as f:
-                text = ''.join(f.readlines())
-                elements.append((text, Language(lang)))
+                elements.append((''.join(f.readlines()), Language(lang)))
 
     classifier.train(elements)
     return classifier
+
+
+def _test(classifier, test_path):
+    for lang, files in _load_dataset(test_path).items():
+        tally = {}
+
+        for path in files:
+            with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                result = classifier.classify(text = ''.join(f.readlines()))
+
+            tally[result] = (tally[result] if result in tally else 0) + 1
+
+        if Language(lang) not in tally:
+            tally[Language(lang)] = 0
+
+        for k in tally:
+            tally[k] /= len(files)
+
+        accuracy = tally[Language(lang)] * 100
+        del tally[Language(lang)]
+
+        next = max(tally, key=tally.get)
+
+        print('{0} => {1:.1f}% accuracy ({2:.1f}% detected as {3})'.format(lang, accuracy, tally[next] * 100, next))
 
 
 def cli_train():
@@ -376,11 +395,9 @@ def cli_train():
         formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-x', '--threshold', nargs=1, type=float,
-                        default=Classifier.DEFAULT_THRESHOLD,
-                        metavar='N',
+                        default=None, metavar='N',
                         help="the classifier threshold value")
-    parser.add_argument('-o', '--out', default=None,
-                        metavar='DEST',
+    parser.add_argument('-o', '--out', default=None, metavar='DEST',
                         help="output path for trained dataset")
     parser.add_argument('train', nargs=1, metavar='TRAIN',
                         help="path to the training set folder")
@@ -395,12 +412,10 @@ def cli_train():
         classifier, args.out = Classifier(args.train[0]), None
     else:
         print("Training classifier on `{}'...".format(args.train[0]))
-        classifier = generate_classifier(args.train[0], args.threshold)
+        classifier = _train_classifier(args.train[0], args.threshold)
 
     if args.test:
-        print("Testing...")
-        # TODO: do testing here
-        # test(classifier, args.test[0])
+        _test(classifier, args.test)
 
     if args.out:
         print("Saving trained dataset to `{}'...".format(args.out))
