@@ -17,7 +17,7 @@ MARKERS = [
     _compiled_regex(r'^\s{2,}\S'), # indentation
 
     # TODO: need to explain what is going on here as it's not obvious
-    _compiled_regex(r'.{,2}\s*[=/\*-\+&\|%@<>{}\[\](\)~`_\^;#]+\s*.{,2}'),  # generic symbol capture
+    _compiled_regex(r'.{,2}\s*[=/\*-\+\|<\{\}\[\](\)~`_\^;#]+\s*.{,2}'),  # generic symbol capture
 
     # C preprocessor markers
 
@@ -140,6 +140,17 @@ MARKERS = [
     _compiled_regex(r'(({|\[)\s({|\[))+'),
     _compiled_regex(r'((}|\])\s(}|\]))+'),
 
+    # Javascript markers
+
+    _compiled_regex(r'\w+\.get(.*?);'),
+    _compiled_regex(r'\w+:\s*function\s*\((.*?)},?'),
+    _compiled_regex(r'this\.\w+'),
+    _compiled_regex(r'var\s+\w+(\s*,\s*\w+)*\s*=(.*?);$'),
+    _compiled_regex(r'[\.\w+]+\s*===\s*[\.\w+]+'),
+    _compiled_regex(r'require\s*\((.*?)\);?'),
+    _compiled_regex(r'undefined'),
+    _compiled_regex(r'\.length'),
+    _compiled_regex(r'\$\((.*?)\);'),
 
 
 
@@ -190,11 +201,6 @@ MARKERS = [
     _compiled_regex(r'\s+I[A-Z].\w+'),
     _compiled_regex(r'=>\s+{'),
     _compiled_regex(r'throw new \w+\((.*?)\);\s*$'),
-
-    # JS markers
-    _compiled_regex(r'\s.function\s+\w+\('),
-    _compiled_regex(r'\.length'),
-    _compiled_regex(r'require\s+\(' + '(\'|")\)'),
 
     # C/C++ markers
     _compiled_regex(r'\w+\s*\*\s*[a-zA-Z_]\w+'),
