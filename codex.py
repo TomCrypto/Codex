@@ -13,12 +13,14 @@ def _compiled_regex(pattern, dotall=True):
 
 MARKERS = [
     # Markers applicable to several languages
-    
+
     _compiled_regex(r'^\s{2,}\S'), # indentation
+
+    # TODO: need to explain what is going on here as it's not obvious
     _compiled_regex(r'.{,2}\s*[=/\*-\+&\|%@<>{}\[\](\)~`_\^;#]+\s*.{,2}'),  # generic symbol capture
 
     # C preprocessor markers
-    
+
     _compiled_regex(r'^\s*#\s*include\s+("|<)[^">]+("|>)$'),
     _compiled_regex(r'^\s*#\s*ifn?def\s+\w+$'),
     _compiled_regex(r'^\s*#\s*if\s+(.*?)$'),
@@ -28,9 +30,9 @@ MARKERS = [
     _compiled_regex(r'^\s*#\s*undef\s+\w+$'),
     _compiled_regex(r'^\s*#\s*else$'),
     _compiled_regex(r'^\s*#\s*pragma(.*?)$'),
-    
+
     # Delphi markers
-    
+
     # TODO: Delphi preprocessor markers
     _compiled_regex(r'^unit\s+\w;$'),
     _compiled_regex(r'^interface(\s+^uses(.*?))?;$'),
@@ -49,9 +51,9 @@ MARKERS = [
     _compiled_regex(r'^\s*begin(.*?)^\s*end'),
     _compiled_regex(r'\w+\s*:=\s*(.*?);'),
     _compiled_regex(r'<>'),
-    
+
     # Python markers
-    
+
     _compiled_regex(r'^(\s*from\s+[\.\w]+)?\s*import\s+[\*\.,\w]+(,\s*[\*\.,\w]+)*(\s+as\s+\w+)?$'),
     _compiled_regex(r'^\s*def\s+\w+\((.*?):$'),
     _compiled_regex(r'^\s*if\s(.*?):$(.*?)(^\s*else:)?$'),
@@ -74,6 +76,7 @@ MARKERS = [
     _compiled_regex(r'^\s*raise\s+\w+Error(.*?)$'),
 
     # Haskell markers
+
     _compiled_regex(r'let\s+\w+\s*='),
     _compiled_regex(r'::\s+\w+\s+->'),
     _compiled_regex(r'>>='),
@@ -94,6 +97,34 @@ MARKERS = [
     _compiled_regex(r'where$'),
     _compiled_regex(r'^\s*\|\s+\w+(.*?)=(.*?)$'),
 
+    # XML markers
+
+    _compiled_regex(r'</?\w+>'),
+    _compiled_regex(r'<\?xml(.*?)\?>'),
+
+    # HTML markers
+
+    _compiled_regex(r'<script>(.*?)</script>'),
+    _compiled_regex(r'<style>(.*?)</style>'),
+    _compiled_regex(r'<link>(.*?)</link>'),
+    _compiled_regex(r'<title>(.*?)</title>'),
+    _compiled_regex(r'<center>(.*?)</center>'),
+    _compiled_regex(r'</!DOCTYPE html(.*?)>'),
+    _compiled_regex(r'<br>'),
+    _compiled_regex(r'&nbsp;'),
+    _compiled_regex(r'<div(\s+[\.\-\w]+="[^"]*")*>(.*?)</div>'),
+    _compiled_regex(r'<span(\s+[\.\-\w]+="[^"]*")*>(.*?)</span>'),
+    _compiled_regex(r'<p(\s+[\.\-\w]+="[^"]*")*>(.*?)</p>'),
+    _compiled_regex(r'<ul(\s+[\.\-\w]+="[^"]*")*>(.*?)</ul>'),
+    _compiled_regex(r'<ol(\s+[\.\-\w]+="[^"]*")*>(.*?)</ol>'),
+    _compiled_regex(r'<li(\s+[\.\-\w]+="[^"]*")*>(.*?)</li>'),
+    _compiled_regex(r'<pre(\s+[\.\-\w]+="[^"]*")*>(.*?)</pre>'),
+    _compiled_regex(r'<h\d(\s+[\.\-\w]+="[^"]*")*>(.*?)</h\d>'),
+    _compiled_regex(r'<table(\s+[\.\-\w]+="[^"]*")*>(.*?)</table>'),
+    _compiled_regex(r'<tr(\s+[\.\-\w]+="[^"]*")*>(.*?)</tr>'),
+    _compiled_regex(r'<td(\s+[\.\-\w]+="[^"]*")*>(.*?)</td>'),
+    _compiled_regex(r'<img(.*?)>'),
+
 
 
 
@@ -111,7 +142,7 @@ MARKERS = [
     _compiled_regex(r'var\s+\w+\s*='),
     _compiled_regex(r'\$\w+'),
     _compiled_regex(r'std::'),
-    _compiled_regex(r'\*\w+|\w+\*'),
+    #_compiled_regex(r'\*\w+|\w+\*'),
     _compiled_regex(r'&&|\|\||>>|<<'),
     _compiled_regex(r'\+=|-=|/=|\*=|==|!='),
     _compiled_regex(r'^\s*class'),
@@ -128,8 +159,6 @@ MARKERS = [
     _compiled_regex(r'static_cast<'),
     _compiled_regex(r'dynamic_cast<'),
     _compiled_regex(r'nullptr'),
-    _compiled_regex(r'#define'),
-    _compiled_regex(r'#ifdef'),
     _compiled_regex(r'operator::'),
 
     _compiled_regex(r'__\w+'),
@@ -157,30 +186,10 @@ MARKERS = [
     _compiled_regex(r'}}'),
     _compiled_regex(r': "'),
 
-    # XML/HTML markers
-    _compiled_regex(r'</?\w+>'),
-    _compiled_regex(r'<!--'),
-
-    # HTML markers
-    _compiled_regex(r'</?div>'),
-    _compiled_regex(r'</?span>'),
-    _compiled_regex(r'</?p>'),
-    _compiled_regex(r'</?center>'),
-    _compiled_regex(r'</!DOCTYPE html>'),
-    _compiled_regex(r'<br>'),
-    _compiled_regex(r'&nbsp;'),
-
     # JS markers
     _compiled_regex(r'\s.function\s+\w+\('),
     _compiled_regex(r'\.length'),
     _compiled_regex(r'require\s+\(' + '(\'|")\)'),
-
-    # Preprocessor markers
-    _compiled_regex(r'^\s*#include (<|")'),
-    _compiled_regex(r'^\s*#pragma\s'),
-    _compiled_regex(r'^\s*#define\s'),
-    _compiled_regex(r'^\s*#if(n?def)?\s'),
-    _compiled_regex(r'^\s*#undef\s'),
 
     # C/C++ markers
     _compiled_regex(r'\w+\s*\*\s*[a-zA-Z_]\w+'),
@@ -199,6 +208,7 @@ MARKERS = [
     _compiled_regex(r'^\w*struct\s*(\w+\s*)?{'),
     _compiled_regex(r'\w+:\w+\('),
 
+    # TeX markers
 
     _compiled_regex(r'\\begin'),
     _compiled_regex(r'\\end'),
@@ -238,7 +248,7 @@ class Language(enum.Enum):
     Javascript      = 'Javascript'
     Xml             = 'XML'
     Html            = 'HTML'
-    Tex             = 'Tex'
+    Tex             = 'TeX'
     Json            = 'JSON'
 
 
@@ -397,6 +407,7 @@ def _train_classifier(train_path, threshold):
 
 
 def _test(classifier, test_path):
+    print('+--------------------+----------+--------------------+')
     print('| Language           | Accuracy | Closest Language   |')
     print('| ------------------ | -------- | ------------------ |')
 
@@ -426,6 +437,7 @@ def _test(classifier, test_path):
         print('| {0:4.1f}% '.format(tally[closest] * 100), end='')
         print('{0: <12} |'.format(closest.value if closest else "None"))
 
+    print('+--------------------+----------+--------------------+')
 
 def cli_train():
     parser = argparse.ArgumentParser(description=_train_descr,

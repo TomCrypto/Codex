@@ -51,8 +51,8 @@ TODO
 ----
 
 - [ ] add support for the most popular languages
-- [ ] improve script to train classifier from a dataset folder
-- [ ] write scripts to test the classifier against a test set
+- [x] improve script to train classifier from a dataset folder
+- [x] write scripts to test the classifier against a test set
 - [ ] write scripts to generate a training set (code corpus from github)?
 
 How it works
