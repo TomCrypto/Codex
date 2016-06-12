@@ -3,10 +3,60 @@ Codex - Source code language classification
 
 This small library is an attempt to classify source code using a support vector machine (SVM) classifier.
 
-It doesn't work very well currently but is still in development.
+It doesn't work very well currently and is missing many languages but is still in development.
 
-Motivation
-----------
+Usage
+-----
+
+For now please use the pre-trained dataset in `dataset/dataset.bin` (this will be improved later).
+
+
+To initialize the classifier:
+
+```python
+>>> import codex
+>>> classifier = codex.Classifier('dataset/dataset.bin')
+```
+
+To classify a piece of code:
+
+```python
+>>> classifier.classify("""
+... #include <stdio.h>
+... 
+... int main(void) {
+...   printf("hello\n");
+... }
+... """)
+<Language.C: 'C'>
+```
+
+The `classify` method will return `None` or a best guess if it cannot ascertain the language. In particular, it will return `None` if the input isn't code but is ordinary text.
+
+The classifier can be retrained on additional data with `cls.train`.
+
+Supported languages
+-------------------
+
+The accuracy table below is calculated by running the classifier trained with the default dataset on a representative test set, and the percentages are obtained as `(# <language> detected as <language>) / (# <language) * 100`.
+
+| Language      | Accuracy |
+| ------------- | -------- |
+| Delphi        |  93.10%  |
+| Python        |  89.00%  |
+| Java          |  84.82%  |
+| (other)       |  20.30%  |
+
+TODO
+----
+
+- [ ] add support for the most popular languages
+- [ ] improve script to train classifier from a dataset folder
+- [ ] write scripts to test the classifier against a test set
+- [ ] write scripts to generate a training set (code corpus from github)?
+
+How it works
+------------
 
 The motivation for writing this library was to develop a [Discord](https://discordapp.com/) bot that detects when someone posts code, automatically formats it with backticks and sets the proper language. This requires that the bot be able to:
 
@@ -36,35 +86,3 @@ There is a special case where such constructs can lead to severe ambiguity betwe
   * `{...}`: Block comment in Delphi, compound statement in C-like languages
 
 As a general rule, misclassifying the input as the wrong language is preferable to mistakenly detecting normal text as code and vice versa, whenever possible (which is why the threshold value needs to be carefully tuned).
-
-Usage
------
-
-TODO: dataset stuff
-
-For now please use the pre-trained dataset in `dataset/dataset.bin`.
-
-
-To initialize the classifier:
-
-```python
->>> import codex
->>> classifier = codex.Classifier('dataset/dataset.bin')
-```
-
-To classify a piece of code:
-
-```python
->>> classifier.classify("""
-... #include <stdio.h>
-... 
-... int main(void) {
-...   printf("hello\n");
-... }
-... """)
-<Language.C: 'C'>
-```
-
-The `classify` method will return `None` or a best guess if it cannot ascertain the language. In particular, it will return `None` if the input isn't code but is ordinary text.
-
-The classifier can be retrained on additional data with `cls.train`.

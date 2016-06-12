@@ -335,7 +335,7 @@ def load_dataset(dataset):
 
 
 def generate_classifier(dataset, output):
-    classifier = Classifier()
+    classifier = Classifier(threshold=0.5)
 
     elements = []
 
