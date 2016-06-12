@@ -7,16 +7,16 @@ import enum, gzip
 import os.path
 
 
-def compiled_regex(pattern):
-    flags = re.MULTILINE | re.DOTALL
+def compiled_regex(pattern, dotall=True):
+    flags = (re.MULTILINE | re.DOTALL) if dotall else re.MULTILINE
     return re.compile(pattern, flags)
 
 
 MARKERS = [
     # Markers applicable to several languages
     
-    compiled_regex(r'^\s{2,}\S'),
-    compiled_regex(r';$'),
+    compiled_regex(r'^\s{2,}\S'), # indentation
+    compiled_regex(r'.{,2}\s*[=/\*-\+&\|%@<>{}\[\](\)~`_\^;#]+\s*.{,2}'),  # generic symbol capture
 
     # C preprocessor markers
     
@@ -28,6 +28,7 @@ MARKERS = [
     compiled_regex(r'^\s*#\s*endif$'),
     compiled_regex(r'^\s*#\s*undef\s+\w+$'),
     compiled_regex(r'^\s*#\s*else$'),
+    compiled_regex(r'^\s*#\s*pragma(.*?)$'),
     
     # Delphi markers
     
@@ -50,7 +51,29 @@ MARKERS = [
     compiled_regex(r'\w+\s*:=\s*(.*?);'),
     compiled_regex(r'<>'),
     
+    # Python markers
     
+    compiled_regex(r'^(\s*from\s+[\.\w]+)?\s*import\s+[\*\.,\w]+(,\s*[\*\.,\w]+)*(\s+as\s+\w+)?$'),
+    compiled_regex(r'^\s*def\s+\w+\((.*?):$'),
+    compiled_regex(r'^\s*if\s(.*?):$(.*?)(^\s*else:)?$'),
+    compiled_regex(r'^\s*if\s(.*?):$(.*?)(^\s*elif:)?$'),
+    compiled_regex(r'^\s*try:$(.*?)^\s*except(.*?):'),
+    compiled_regex(r'True|False'),
+    compiled_regex(r'==\s+(True|False)'),
+    compiled_regex(r'is\s+(None|True|False)'),
+    compiled_regex(r'if\s+(\S*?)\s+in'),
+    compiled_regex(r'^\s*return$'),
+    compiled_regex(r'^\s*return\s+\w+(,\s+\w+)*$'),
+    compiled_regex(r'^\s*pass$'),
+    compiled_regex(r'print\((.*?)\)$'),
+    compiled_regex(r'^\s*for\s+\w+\s+in\s+(.*?):$'),
+    compiled_regex(r'^\s*class\s+\w+\s*(\([.\w]+\))?:$'),
+    compiled_regex(r'^\s*@(staticmethod|classmethod|property)$'),
+    compiled_regex(r'__repr__'),
+    compiled_regex(r'"(.*?)"\s+%\s+(.*?)$', dotall=False),
+    compiled_regex(r"'(.*?)'\s+%\s+(.*?)$", dotall=False),
+    compiled_regex(r'^\s*raise\s+\w+Error(.*?)$'),
+
     # TODO: everything below needs to be reviewed
 
     compiled_regex(r'^module'),
@@ -199,8 +222,8 @@ class Language(enum.Enum):
 
 
 class Classifier:
-    MIN_CHARACTERS = 6
-    DEFAULT_THRESHOLD = 0.2
+    MIN_CHARACTERS = 50
+    DEFAULT_THRESHOLD = 0.3
 
     def __init__(self, dataset=None, threshold=None):
         if not threshold:
@@ -295,6 +318,9 @@ class Classifier:
 
 
 """ Training helper functions """
+
+# TODO: improve the below
+
 
 
 
