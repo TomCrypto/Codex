@@ -38,7 +38,9 @@ The classifier can be retrained on additional data with `cls.train`.
 Supported languages
 -------------------
 
-The accuracy table below is calculated by running the classifier trained with the default dataset on a representative test set, and the percentages are obtained as `(# <language> detected as <language>) / (# <language) * 100`. Here "None" can be read as "anything that isn't source code", and should generally be interpreted that way throughout the library.
+The accuracy table below is calculated by running the classifier trained with the default dataset on a representative test set, and the percentages are obtained as `(# <language> files detected as <language>) / (# <language files) * 100`.
+
+Here "None" can be read as "anything that isn't source code", and should generally be interpreted that way throughout the library.
 
 | Language           | Accuracy | Closest Language   |
 | ------------------ | -------- | ------------------ |
@@ -66,6 +68,8 @@ TODO
 - [x] improve script to train classifier from a dataset folder
 - [x] write scripts to test the classifier against a test set
 - [ ] write scripts to generate a training set (code corpus from github)?
+- [ ] better documentation
+- [ ] better test set
 
 How it works
 ------------
