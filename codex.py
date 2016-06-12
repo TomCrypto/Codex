@@ -100,7 +100,8 @@ MARKERS = [
 
     # XML markers
 
-    _compiled_regex(r'</?\w+>'),
+    _compiled_regex(r'<\w+(\s+[\.\-\w]+="[^"]*")*>(.*?)</\w+>'),
+    _compiled_regex(r'<\w+(\s+[\.\-\w]+="[^"]*")*/>'),
     _compiled_regex(r'<\?xml(.*?)\?>'),
 
     # HTML markers
@@ -431,14 +432,16 @@ def _test(classifier, test_path):
 
             tally[result] = (tally[result] if result in tally else 0) + 1
 
-        if Language(folder) not in tally:
-            tally[Language(folder)] = 0
+        folder_lang = Language(folder) if folder != "None" else None
+
+        if folder_lang not in tally:
+            tally[folder_lang] = 0
 
         for k in tally:
             tally[k] /= len(files)
 
-        accuracy = tally[Language(folder)] * 100
-        del tally[Language(folder)]  # forget it
+        accuracy = tally[folder_lang] * 100
+        del tally[folder_lang]  # forget it
 
         closest = max(tally, key=tally.get)
         closest_lang = tally[closest] * 100

@@ -3,7 +3,7 @@ Codex - Source code language classification
 
 This small library is an attempt to classify source code using a support vector machine (SVM) classifier.
 
-It doesn't work very well currently and is missing many languages but is still in development.
+It doesn't work very well currently and is missing many languages but is still in development. The current data sets used to train and test the classifier are atrociously bad (non-reviewed random selection of repositories from Github) so the classifier will probably be somewhat off until this is fixed.
 
 Usage
 -----
@@ -38,19 +38,31 @@ The classifier can be retrained on additional data with `cls.train`.
 Supported languages
 -------------------
 
-The accuracy table below is calculated by running the classifier trained with the default dataset on a representative test set, and the percentages are obtained as `(# <language> detected as <language>) / (# <language) * 100`.
+The accuracy table below is calculated by running the classifier trained with the default dataset on a representative test set, and the percentages are obtained as `(# <language> detected as <language>) / (# <language) * 100`. Here "None" can be read as "anything that isn't source code", and should generally be interpreted that way throughout the library.
 
-| Language      | Accuracy |
-| ------------- | -------- |
-| Delphi        |  93.10%  |
-| Python        |  89.00%  |
-| Java          |  84.82%  |
-| (other)       |  20.30%  |
+| Language           | Accuracy | Closest Language   |
+| ------------------ | -------- | ------------------ |
+| Java               |   82.1%  |  5.0% C++          |
+| TeX                |   91.7%  |  7.4% None         |
+| C                  |   86.3%  |  3.9% C#           |
+| Delphi             |   94.7%  |  1.8% C            |
+| Python             |   93.1%  |  1.5% Haskell      |
+| PHP                |   86.4%  |  8.2% HTML         |
+| None               |   95.9%  |  2.8% HTML         |
+| JSON               |   96.9%  |  3.1% None         |
+| XML                |   65.9%  | 16.4% None         |
+| Ruby               |   65.8%  |  7.5% Python       |
+| HTML               |   90.0%  |  3.3% XML          |
+| C#                 |   44.0%  | 15.8% XML          |
+| Lua                |   86.1%  |  3.9% None         |
+| Haskell            |   96.9%  |  1.4% None         |
+| C++                |   65.2%  | 23.9% C            |
+| Javascript         |   90.9%  |  2.9% C            |
 
 TODO
 ----
 
-- [ ] add support for the most popular languages
+- [ ] add proper support for the most popular languages
 - [x] improve script to train classifier from a dataset folder
 - [x] write scripts to test the classifier against a test set
 - [ ] write scripts to generate a training set (code corpus from github)?
