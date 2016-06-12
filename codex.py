@@ -221,8 +221,8 @@ class Language(enum.Enum):
 
 
 class Classifier:
-    MIN_CHARACTERS = 50
-    DEFAULT_THRESHOLD = 0.3
+    MIN_CHARACTERS = 40
+    DEFAULT_THRESHOLD = 0.25
 
     def __init__(self, dataset=None, threshold=None):
         if not threshold:
@@ -322,7 +322,7 @@ class Classifier:
 ###########################
 
 
-train_descr="""
+_train_descr="""
 Script to train a classifier on a folder containing the training
 set as a collection of source code files. The layout should be:
 
@@ -339,10 +339,16 @@ Every file in the language folders will be processed, regardless
 of extension, and top-level files in the folder will be ignored.
 """
 
+_classify_descr="""
+Script to classify a list of files given on the command line, or
+standard input. Each file will be classified and the result will
+be displayed.
+"""
+
 
 import argparse
 import os.path
-import os
+import os, sys
 
 
 def _load_dataset(dataset):
@@ -367,7 +373,10 @@ def _train_classifier(train_path, threshold):
 
 
 def _test(classifier, test_path):
-    for lang, files in _load_dataset(test_path).items():
+    print('| Language           | Accuracy | Closest Language   |')
+    print('| ------------------ | -------- | ------------------ |')
+
+    for folder, files in _load_dataset(test_path).items():
         tally = {}
 
         for path in files:
@@ -376,22 +385,26 @@ def _test(classifier, test_path):
 
             tally[result] = (tally[result] if result in tally else 0) + 1
 
-        if Language(lang) not in tally:
-            tally[Language(lang)] = 0
+        if Language(folder) not in tally:
+            tally[Language(folder)] = 0
 
         for k in tally:
             tally[k] /= len(files)
 
-        accuracy = tally[Language(lang)] * 100
-        del tally[Language(lang)]
+        accuracy = tally[Language(folder)] * 100
+        del tally[Language(folder)]  # forget it
 
-        next = max(tally, key=tally.get)
+        closest = max(tally, key=tally.get)
+        closest_lang = tally[closest] * 100
 
-        print('{0} => {1:.1f}% accuracy ({2:.1f}% detected as {3})'.format(lang, accuracy, tally[next] * 100, next))
+        print('| {0: <18} '.format(folder), end='')
+        print('|  {0:5.1f}%  '.format(accuracy), end='')
+        print('| {0:4.1f}% '.format(tally[closest] * 100), end='')
+        print('{0: <12} |'.format(closest.value if closest else "None"))
 
 
 def cli_train():
-    parser = argparse.ArgumentParser(description=train_descr,
+    parser = argparse.ArgumentParser(description=_train_descr,
         formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument('-x', '--threshold', nargs=1, type=float,
@@ -420,3 +433,29 @@ def cli_train():
     if args.out:
         print("Saving trained dataset to `{}'...".format(args.out))
         classifier.save(args.out)
+
+
+def cli_classify():
+    parser = argparse.ArgumentParser(description=_classify_descr,
+        formatter_class=argparse.RawTextHelpFormatter)
+
+    parser.add_argument('dataset', nargs=1, metavar='DATASET',
+                        help="path to pre-trained dataset")
+    parser.add_argument('files', nargs='*', metavar='FILE',
+                        help="paths to files to classify")
+
+    args = parser.parse_args()
+
+    classifier = Classifier(args.dataset[0])
+
+    if not args.files:
+        args.files = ['-']
+
+    for path in args.files:
+        if path == '-':
+            text = ''.join(sys.stdin.readlines())
+        else:
+            with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                text = ''.join(f.readlines())
+
+        print('{0}\t{1}'.format(path, classifier.classify(text)))

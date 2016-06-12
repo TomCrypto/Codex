@@ -16,7 +16,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'codex-train = codex:cli_train'
+            'codex-train = codex:cli_train',
+            'codex-classify = codex:cli_classify'
         ]
     }
 )
