@@ -25,7 +25,7 @@ which matches C/C++ `#include` statements. The basic algorithm then goes as foll
 
 1) For each marker, find all non-overlapping matches of the pattern in the input, calculate how many characters of the input were matched, and divide this number by the length of the text in characters; this is the *weight* of the text for that marker.
 
-2) Sum up all the marker weights to obtain the text's *score*; if this score is below some configurable threshold - which in some vague sense describes how much (of) the input text looks like code - then terminate by rejecting the input text as not code.
+2) Sum up all the marker weights to obtain the text's *score*; if this score - which in some vague sense describes how much (of) the input text looks like code - is below some configurable threshold, then terminate by rejecting the input text as not code.
 
 3) Otherwise, determine the closest language using the weights with a linear support vector machine (SVM) classifier.
 
