@@ -34,6 +34,7 @@ MARKERS = [
     # Delphi markers
 
     # TODO: Delphi preprocessor markers
+    _compiled_regex(r'{\$(.*?)}$'),
     _compiled_regex(r'^unit\s+\w;$'),
     _compiled_regex(r'^interface(\s+^uses(.*?))?;$'),
     _compiled_regex(r'\w+\s*=\s*(.*?);'),
@@ -125,6 +126,19 @@ MARKERS = [
     _compiled_regex(r'<td(\s+[\.\-\w]+="[^"]*")*>(.*?)</td>'),
     _compiled_regex(r'<img(.*?)>'),
 
+    # JSON markers
+
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*\['),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*\[]'),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*{'),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*{}'),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*[\.\-\deE]+\s*(,|}|\])'),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*"[^"]*"\s*(,|}|\])'),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*true\s*(,|}|\])'),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*false\s*(,|}|\])'),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*null\s*(,|}|\])'),
+    _compiled_regex(r'(({|\[)\s({|\[))+'),
+    _compiled_regex(r'((}|\])\s(}|\]))+'),
 
 
 
@@ -176,15 +190,6 @@ MARKERS = [
     _compiled_regex(r'\s+I[A-Z].\w+'),
     _compiled_regex(r'=>\s+{'),
     _compiled_regex(r'throw new \w+\((.*?)\);\s*$'),
-
-    # JSON markers
-    _compiled_regex(r'{\s*"[^"]*?":'),
-    _compiled_regex(r':\s*{'),
-    _compiled_regex(r':\s*\['),
-    _compiled_regex(r'},'),
-    _compiled_regex(r'\],'),
-    _compiled_regex(r'}}'),
-    _compiled_regex(r': "'),
 
     # JS markers
     _compiled_regex(r'\s.function\s+\w+\('),
