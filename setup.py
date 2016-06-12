@@ -13,5 +13,10 @@ setup(
     packages=find_packages(),
     classifiers=[
         'Programming Language :: Python :: 3',
-    ]
+    ],
+    entry_points={
+        'console_scripts': [
+            'codex-train = codex:cli_train'
+        ]
+    }
 )
