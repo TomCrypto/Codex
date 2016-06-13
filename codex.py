@@ -100,8 +100,9 @@ MARKERS = [
 
     # XML markers
 
-    _compiled_regex(r'<\w+(\s+[\.\-\w]+="[^"]*")*>(.*?)</\w+>'),
-    _compiled_regex(r'<\w+(\s+[\.\-\w]+="[^"]*")*/>'),
+    _compiled_regex(r'<\w+\s*(\s+[:\.\-\w]+="[^"]*")*\s*>(.*?)<\s*/\w+\s*>'),
+    _compiled_regex(r'<\s*/\w+\s*(\s+[:\.\-\w]+="[^"]*")*\s*>(.*?)<\s*/\w+\s*>'),
+    _compiled_regex(r'<\w+\s*(\s+[:\.\-\w]+="[^"]*")*\s*/>'),
     _compiled_regex(r'<\?xml(.*?)\?>'),
 
     # HTML markers
@@ -114,17 +115,17 @@ MARKERS = [
     _compiled_regex(r'</!DOCTYPE html(.*?)>'),
     _compiled_regex(r'<br>'),
     _compiled_regex(r'&nbsp;'),
-    _compiled_regex(r'<div(\s+[\.\-\w]+="[^"]*")*>(.*?)</div>'),
-    _compiled_regex(r'<span(\s+[\.\-\w]+="[^"]*")*>(.*?)</span>'),
-    _compiled_regex(r'<p(\s+[\.\-\w]+="[^"]*")*>(.*?)</p>'),
-    _compiled_regex(r'<ul(\s+[\.\-\w]+="[^"]*")*>(.*?)</ul>'),
-    _compiled_regex(r'<ol(\s+[\.\-\w]+="[^"]*")*>(.*?)</ol>'),
-    _compiled_regex(r'<li(\s+[\.\-\w]+="[^"]*")*>(.*?)</li>'),
-    _compiled_regex(r'<pre(\s+[\.\-\w]+="[^"]*")*>(.*?)</pre>'),
-    _compiled_regex(r'<h\d(\s+[\.\-\w]+="[^"]*")*>(.*?)</h\d>'),
-    _compiled_regex(r'<table(\s+[\.\-\w]+="[^"]*")*>(.*?)</table>'),
-    _compiled_regex(r'<tr(\s+[\.\-\w]+="[^"]*")*>(.*?)</tr>'),
-    _compiled_regex(r'<td(\s+[\.\-\w]+="[^"]*")*>(.*?)</td>'),
+    _compiled_regex(r'<div(\s+[:\.\-\w]+="[^"]*")*>(.*?)</div>'),
+    _compiled_regex(r'<span(\s+[:\.\-\w]+="[^"]*")*>(.*?)</span>'),
+    _compiled_regex(r'<p(\s+[:\.\-\w]+="[^"]*")*>(.*?)</p>'),
+    _compiled_regex(r'<ul(\s+[:\.\-\w]+="[^"]*")*>(.*?)</ul>'),
+    _compiled_regex(r'<ol(\s+[:\.\-\w]+="[^"]*")*>(.*?)</ol>'),
+    _compiled_regex(r'<li(\s+[:\.\-\w]+="[^"]*")*>(.*?)</li>'),
+    _compiled_regex(r'<pre(\s+[:\.\-\w]+="[^"]*")*>(.*?)</pre>'),
+    _compiled_regex(r'<h\d(\s+[:\.\-\w]+="[^"]*")*>(.*?)</h\d>'),
+    _compiled_regex(r'<table(\s+[:\.\-\w]+="[^"]*")*>(.*?)</table>'),
+    _compiled_regex(r'<tr(\s+[:\.\-\w]+="[^"]*")*>(.*?)</tr>'),
+    _compiled_regex(r'<td(\s+[:\.\-\w]+="[^"]*")*>(.*?)</td>'),
     _compiled_regex(r'<img(.*?)>'),
 
     # JSON markers
@@ -153,6 +154,33 @@ MARKERS = [
     _compiled_regex(r'\.length'),
     _compiled_regex(r'\$\((.*?)\);'),
 
+    # C# markers
+
+    # TODO: these are not good
+    _compiled_regex(r'^\s*#region(.*?)#endregion$'),
+    _compiled_regex(r'^\s*foreach\s*\((.*?)$', dotall=False),
+    _compiled_regex(r'^\s*using(.*?)$'),
+    _compiled_regex(r':\s*base\([^\)]+\)$'),
+
+    # C++ markers
+
+    _compiled_regex(r'^\s*template\s*<(.*?)>$'),
+    _compiled_regex(r'size_t'),
+    _compiled_regex(r'\w*::\w+'),
+    _compiled_regex(r'\w+::\w+\((.*?)\);'),
+    _compiled_regex(r'\w+::\w+\([^\{]+\s*\{(.*?)\w+::\w+\('),
+    _compiled_regex(r'(std::)?cout\s*<<(.*?);'),
+    _compiled_regex(r'(std::)?cin\s*>>(.*?);'),
+    _compiled_regex(r'std::\w+'),
+
+    _compiled_regex(r'static_assert\((.*?);'),
+    _compiled_regex(r'static_cast<[^>]>'),
+    _compiled_regex(r'dynamic_cast<[^>]>'),
+    _compiled_regex(r'nullptr'),
+
+
+
+
 
 
 
@@ -167,7 +195,6 @@ MARKERS = [
     _compiled_regex(r'local\s+\w+\s*='),
     _compiled_regex(r'var\s+\w+\s*='),
     _compiled_regex(r'\$\w+'),
-    _compiled_regex(r'std::'),
     #_compiled_regex(r'\*\w+|\w+\*'),
     _compiled_regex(r'&&|\|\||>>|<<'),
     _compiled_regex(r'\+=|-=|/=|\*=|==|!='),
@@ -181,10 +208,6 @@ MARKERS = [
     _compiled_regex(r'try\s*{'),
     _compiled_regex(r'}\s*catch'),
     _compiled_regex(r'namespace\s*{'),
-    _compiled_regex(r'static_assert\('),
-    _compiled_regex(r'static_cast<'),
-    _compiled_regex(r'dynamic_cast<'),
-    _compiled_regex(r'nullptr'),
     _compiled_regex(r'operator::'),
 
     _compiled_regex(r'__\w+'),
@@ -210,13 +233,11 @@ MARKERS = [
     _compiled_regex(r'^\s*};'),
     _compiled_regex(r'if\s*\((.*?)\)\s*{'),
     _compiled_regex(r'for\s*\((.*?)\)\s*{'),
-    _compiled_regex(r'template\s*<(.*?)>'),
 
     # ???
 
     #_compiled_regex(r'^\s*@\w+'),
     _compiled_regex(r'\(\)'),
-    _compiled_regex(r'\w+::\w+'),
     _compiled_regex(r'^\w*struct\s*(\w+\s*)?{'),
     _compiled_regex(r'\w+:\w+\('),
 
@@ -230,18 +251,18 @@ MARKERS = [
 
 
 SPECIAL = {
-    _compiled_regex(r'<!--(.*?)-->'):    False,
-    _compiled_regex(r'"""(.*?)"""'):     False,
-    _compiled_regex(r"'''(.*?)'''"):     False,
-    _compiled_regex(r'/\*(.*?)\*/'):     False,
-    _compiled_regex(r'//(.*?)$'):        False,
-    _compiled_regex(r'-- (.*?)$'):       False,
-    _compiled_regex(r'--\[\[(.*?)\]\]'): False,
-    _compiled_regex(r'"(.*?)"'):         False,
-    _compiled_regex(r"'(.*?)'"):         False,
-    _compiled_regex(r'\s# (.*?)$'):      False,
-    _compiled_regex(r'\(\*(.*?)\*\)'):   False,
-    _compiled_regex(r'{(.*?)}'):         True,
+    _compiled_regex(r'<!--(.*?)-->'):    (False, '<!--', '-->'),
+    _compiled_regex(r'"""(.*?)"""'):     (False, '"""', '"""'),
+    _compiled_regex(r"'''(.*?)'''"):     (False, "'''", "'''"),
+    _compiled_regex(r'/\*(.*?)\*/'):     (False, '/*', '*/'),
+    _compiled_regex(r'//(.*?)$'):        (False, '//', ''),
+    _compiled_regex(r'-- (.*?)$'):       (False, '--', ''),
+    _compiled_regex(r'--\[\[(.*?)\]\]'): (False, '--[[', ']]'),
+    _compiled_regex(r'"(.*?)"'):         (False, '"', '"'),
+    _compiled_regex(r"'(.*?)'"):         (False, "'", "'"),
+    _compiled_regex(r'\s# (.*?)$'):      (False, '#', ''),
+    _compiled_regex(r'\(\*(.*?)\*\)'):   (False, '(*', '*)'),
+    _compiled_regex(r'{(.*?)}'):         (True, '{', '}'),
 }
 
 
@@ -305,29 +326,36 @@ class Classifier:
         if len(text) >= Classifier.MIN_CHARACTERS:
             return sum(self.weight_vector(text)) < self.threshold
         else:
-            return True
+            return True  # TODO: does this make sense?
 
 
     def measure_weights(self, text):
+        for pattern, (ambiguous, pre, suf) in SPECIAL.items():
+            def repl(match):
+                if not ambiguous or self.is_comment(match.group(1)):
+                    return pre + ' ' + suf
+                else:
+                    return match.group(0)
+
+            text = re.sub(pattern, repl, text)
+
         text = '\n'.join([line.rstrip() for line in text.split('\n')])
         text.replace('\\\n', ' ')  # need to escape trailing backslash
 
-        for pattern, ambiguous in SPECIAL.items():
-            for match in re.finditer(pattern, text):
-                if not ambiguous or self.is_comment(match.group(1)):
-                    text = text[:match.start(0)] + ' ' + text[match.end(0):]
-
-        return self.weight_vector(text)
+        if len(text) >= Classifier.MIN_CHARACTERS:
+            return self.weight_vector(text)
+        else:
+            return None
 
 
     def classify(self, text):
         if self.classif is None:
             raise ValueError("Classifier not trained.")
 
-        if len(text) < Classifier.MIN_CHARACTERS:
-            return None
-
         weights = self.measure_weights(text)
+
+        if weights is None:
+            return None
 
         if sum(weights) >= self.threshold:
             return Language(self.classif.predict([weights])[0])
@@ -336,16 +364,13 @@ class Classifier:
 
 
     def __call__(self, element):
-        if len(element[0]) >= Classifier.MIN_CHARACTERS:
-            return (self.measure_weights(element[0]), element[1].value)
-        else:  # reject the training item if it is too short
-            return (None, None)
+        return (self.measure_weights(element[0]), element[1].value)
 
 
     def train(self, elements):
         with multiprocessing.Pool(processes=None) as par:
             for weights, language in par.map(self, elements):
-                if weights and language:  # check item wasn't rejected
+                if weights:  # check the training item wasn't rejected
                     self.vectors = np.append(self.vectors, [weights], axis=0)
                     self.classes = np.append(self.classes, [language], axis=0)
 
