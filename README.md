@@ -44,22 +44,22 @@ Here "None" can be read as "anything that isn't source code", and should be inte
 
 | Language           | Accuracy | Closest Language   |
 | ------------------ | -------- | ------------------ |
-| Java               |   82.1%  |  5.0% C++          |
-| TeX                |   91.7%  |  7.4% None         |
-| C                  |   86.3%  |  3.9% C#           |
-| Delphi             |   94.7%  |  1.8% C            |
-| Python             |   93.1%  |  1.5% Haskell      |
-| PHP                |   86.4%  |  8.2% HTML         |
-| None               |   95.9%  |  2.8% HTML         |
-| JSON               |   96.9%  |  3.1% None         |
-| XML                |   65.9%  | 16.4% None         |
-| Ruby               |   65.8%  |  7.5% Python       |
-| HTML               |   90.0%  |  3.3% XML          |
-| C#                 |   44.0%  | 15.8% XML          |
-| Lua                |   86.1%  |  3.9% None         |
-| Haskell            |   96.9%  |  1.4% None         |
-| C++                |   65.2%  | 23.9% C            |
-| Javascript         |   90.9%  |  2.9% C            |
+| Python             |   97.7%  |  0.8% PHP          |
+| None               |   93.9%  |  2.8% HTML         |
+| C++                |   64.9%  | 19.2% C            |
+| Ruby               |   86.8%  |  4.6% XML          |
+| Javascript         |   92.0%  |  2.5% JSON         |
+| Lua                |   89.4%  |  2.4% None         |
+| XML                |   94.1%  |  3.2% HTML         |
+| TeX                |   94.1%  |  3.9% None         |
+| HTML               |   93.9%  |  5.0% PHP          |
+| Haskell            |   97.5%  |  0.9% TeX          |
+| C#                 |   87.4%  |  5.7% Java         |
+| C                  |   93.8%  |  4.5% Java         |
+| PHP                |   93.3%  |  2.5% HTML         |
+| Java               |   90.1%  |  3.8% C++          |
+| JSON               |   87.5%  |  6.2% C#           |
+| Delphi             |   93.2%  |  3.9% Java         |
 
 TODO
 ----
@@ -95,7 +95,7 @@ which matches C/C++ `#include` statements. The basic algorithm then goes as foll
 
 3) Otherwise, determine the closest language using the weights with a linear support vector machine (SVM) classifier.
 
-Some preprocessing takes place on the input text prior to the algorithm above. In particular, free-form syntactic elements such as comments and string literals are *completely* removed and replaced with a single space; these are generally not particularly useful for classification, as many languages share identical comment and string literal syntax.
+Some preprocessing takes place on the input text prior to the algorithm above. In particular, free-form syntactic elements such as comments are removed and replaced with their delimiters, for instance everything enclosed in `/*` and `*/` is replaced with `/* */`; these can then be used later on to help identify the language. String literals are left alone as they often show up in normal text and are unreliable to remove at best.
 
 There is a special case where such constructs can lead to severe ambiguity between languages. An example is the Delphi curly brace comment construct, which represents a compound statement in the C family of languages. These are removed **only** if the matched text **doesn't** look like code according to steps (1) and (2) above. Fortunately most cases are not ambiguous, the only known ambiguous cases are given below:
 

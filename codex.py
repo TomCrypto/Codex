@@ -31,6 +31,11 @@ MARKERS = [
     _compiled_regex(r'^\s*#\s*else$'),
     _compiled_regex(r'^\s*#\s*pragma(.*?)$'),
 
+    # C markers
+    
+    # TODO
+    _compiled_regex(r'/\*(.*?)\*/'),
+
     # Delphi markers
 
     # TODO: Delphi preprocessor markers
@@ -51,7 +56,9 @@ MARKERS = [
     _compiled_regex(r'inherited(\s+\w+(\((.*?)\))?)?;'),
     _compiled_regex(r'^\s*begin(.*?)^\s*end'),
     _compiled_regex(r'\w+\s*:=\s*(.*?);'),
-    _compiled_regex(r'<>'),
+    _compiled_regex(r'\s<>\s'),
+    _compiled_regex(r'\(\*(.*?)\*\)'),
+    _compiled_regex(r'{(.*?)}'),
 
     # Python markers
 
@@ -75,6 +82,9 @@ MARKERS = [
     _compiled_regex(r'"(.*?)"\s+%\s+(.*?)$', dotall=False),
     _compiled_regex(r"'(.*?)'\s+%\s+(.*?)$", dotall=False),
     _compiled_regex(r'^\s*raise\s+\w+Error(.*?)$'),
+    _compiled_regex(r'"""(.*?)"""'),
+    _compiled_regex(r"'''(.*?)'''"),
+    _compiled_regex(r'\s# (.*?)$'),
 
     # Haskell markers
 
@@ -97,6 +107,7 @@ MARKERS = [
     _compiled_regex(r'\+\+'),
     _compiled_regex(r'where$'),
     _compiled_regex(r'^\s*\|\s+\w+(.*?)=(.*?)$'),
+    _compiled_regex(r'-- (.*?)$'),
 
     # XML markers
 
@@ -104,6 +115,7 @@ MARKERS = [
     _compiled_regex(r'<\s*/\w+\s*(\s+[:\.\-\w]+="[^"]*")*\s*>(.*?)<\s*/\w+\s*>'),
     _compiled_regex(r'<\w+\s*(\s+[:\.\-\w]+="[^"]*")*\s*/>'),
     _compiled_regex(r'<\?xml(.*?)\?>'),
+    _compiled_regex(r'<!--(.*?)-->'),
 
     # HTML markers
 
@@ -177,9 +189,12 @@ MARKERS = [
     _compiled_regex(r'static_cast<[^>]>'),
     _compiled_regex(r'dynamic_cast<[^>]>'),
     _compiled_regex(r'nullptr'),
+    _compiled_regex(r'//(.*?)$'),
 
+    # Lua markers
 
-
+    # TODO
+    _compiled_regex(r'--\[\[(.*?)\]\]'),
 
 
 
@@ -251,18 +266,16 @@ MARKERS = [
 
 
 SPECIAL = {
-    _compiled_regex(r'<!--(.*?)-->'):    (False, '<!--', '-->'),
-    _compiled_regex(r'"""(.*?)"""'):     (False, '"""', '"""'),
-    _compiled_regex(r"'''(.*?)'''"):     (False, "'''", "'''"),
-    _compiled_regex(r'/\*(.*?)\*/'):     (False, '/*', '*/'),
-    _compiled_regex(r'//(.*?)$'):        (False, '//', ''),
-    _compiled_regex(r'-- (.*?)$'):       (False, '--', ''),
-    _compiled_regex(r'--\[\[(.*?)\]\]'): (False, '--[[', ']]'),
-    _compiled_regex(r'"(.*?)"'):         (False, '"', '"'),
-    _compiled_regex(r"'(.*?)'"):         (False, "'", "'"),
-    _compiled_regex(r'\s# (.*?)$'):      (False, '#', ''),
-    _compiled_regex(r'\(\*(.*?)\*\)'):   (False, '(*', '*)'),
-    _compiled_regex(r'{(.*?)}'):         (True, '{', '}'),
+    _compiled_regex(r'<!--(.*?)-->'):    (False, '<!-- -->'),
+    _compiled_regex(r'"""(.*?)"""'):     (False, '""" """'),
+    _compiled_regex(r"'''(.*?)'''"):     (False, "''' '''"),
+    _compiled_regex(r'/\*(.*?)\*/'):     (False, '/* */'),
+    _compiled_regex(r'//(.*?)$'):        (False, '// '),
+    _compiled_regex(r'-- (.*?)$'):       (False, '-- '),
+    _compiled_regex(r'--\[\[(.*?)\]\]'): (False, '--[[ ]]'),
+    _compiled_regex(r'\s# (.*?)$'):      (False, '# '),
+    _compiled_regex(r'\(\*(.*?)\*\)'):   (False, '(* *)'),
+    _compiled_regex(r'{(.*?)}'):         (True,  '{ }'),
 }
 
 
@@ -326,21 +339,17 @@ class Classifier:
         if len(text) >= Classifier.MIN_CHARACTERS:
             return sum(self.weight_vector(text)) < self.threshold
         else:
-            return True  # TODO: does this make sense?
+            return False
 
 
     def measure_weights(self, text):
-        for pattern, (ambiguous, pre, suf) in SPECIAL.items():
-            def repl(match):
-                if not ambiguous or self.is_comment(match.group(1)):
-                    return pre + ' ' + suf
-                else:
-                    return match.group(0)
-
-            text = re.sub(pattern, repl, text)
-
         text = '\n'.join([line.rstrip() for line in text.split('\n')])
-        text.replace('\\\n', ' ')  # need to escape trailing backslash
+        text = text.replace('\\\n', ' ')  # escape trailing backslash
+
+        for pattern, (ambiguous, repl) in SPECIAL.items():
+            def repl_func(match):
+                return repl if self.is_comment(match.group(0)) else match.group(0)
+            text = re.sub(pattern, repl if not ambiguous else repl_func, text)
 
         if len(text) >= Classifier.MIN_CHARACTERS:
             return self.weight_vector(text)
