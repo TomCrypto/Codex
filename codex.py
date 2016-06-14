@@ -17,11 +17,12 @@ MARKERS = [
     _compiled_regex(r'^\s{2,}\S'), # indentation
 
     # TODO: need to explain what is going on here as it's not obvious
-    _compiled_regex(r'.{,2}\s*[=/\-\+\|<\{\}\[\](\)~`_\^#]+\s*.{,2}'),  # generic symbol capture
+    _compiled_regex(r'.{,1}\s*[=/\-\+\|<\{\}\[\](\)~`_\^#]+\s*.{,1}'),  # generic symbol capture
 
     # C preprocessor markers
 
     _compiled_regex(r'^\s*#\s*include\s+("|<)[^">]+("|>)$'),
+    _compiled_regex(r'^\s*#\s*include\s+<[^\.>]+>$'),  # <> only without .h variant for C++
     _compiled_regex(r'^\s*#\s*ifn?def\s+\w+$'),
     _compiled_regex(r'^\s*#\s*if\s+(.*?)$'),
     _compiled_regex(r'^\s*#\s*if\s+defined\((.*?)$'),
@@ -85,6 +86,28 @@ MARKERS = [
     _compiled_regex(r'"""(.*?)"""'),
     _compiled_regex(r"'''(.*?)'''"),
     _compiled_regex(r'\s# (.*?)$'),
+    _compiled_regex(r'^\s*import re$'),
+    _compiled_regex(r're\.\w+'),
+    _compiled_regex(r'^\s*import time$'),
+    _compiled_regex(r'time\.\w+'),
+    _compiled_regex(r'^\s*import datetime$'),
+    _compiled_regex(r'datetime\.\w+'),
+    _compiled_regex(r'^\s*import random$'),
+    _compiled_regex(r'random\.\w+'),
+    _compiled_regex(r'^\s*import math$'),
+    _compiled_regex(r'math\.\w+'),
+    _compiled_regex(r'^\s*import os$'),
+    _compiled_regex(r'os\.\w+'),
+    _compiled_regex(r'^\s*import os.path$'),
+    _compiled_regex(r'os\.path\.\w+'),
+    _compiled_regex(r'^\s*import sys$'),
+    _compiled_regex(r'sys\.\w+'),
+    _compiled_regex(r'^\s*import argparse$'),
+    _compiled_regex(r'argparse\.\w+'),
+    _compiled_regex(r'^\s*import subprocess$'),
+    _compiled_regex(r'subprocess\.\w+'),
+    _compiled_regex(r'^\s*if\s+__name__\s*=\s*"__main__"\s*:$'),
+    _compiled_regex(r"^\s*if\s+__name__\s*=\s*'__main__'\s*:$"),
 
     # Haskell markers
 
@@ -95,7 +118,7 @@ MARKERS = [
     _compiled_regex(r'^\s*module\s+[\.\w]+(.*?)where$'),
     _compiled_regex(r'^\s*{-#(.*?)#-}'),
     _compiled_regex(r'^\s*\w+\s*::(.*?)$'),
-    _compiled_regex(r'->\s*\[?[\w]+\]?'),
+    _compiled_regex(r'->\s+\[?[\w]+\]?'),
     _compiled_regex(r'\w+\s*<-\s*\w+'),
     _compiled_regex(r'\w+\s+\$\s+\w+'),
     _compiled_regex(r'\(\w+::\w+\)'),
@@ -216,7 +239,7 @@ MARKERS = [
     _compiled_regex(r'^\s*private:'),
     _compiled_regex(r'^\s*protected:'),
     _compiled_regex(r'this->'),
-    _compiled_regex(r'\w+->'),
+    _compiled_regex(r'\w+->\w+'),
     _compiled_regex(r'm_\w+(\.|->)'),
     _compiled_regex(r'try\s*{'),
     _compiled_regex(r'}\s*catch'),
@@ -298,7 +321,7 @@ class Language(enum.Enum):
 
 class Classifier:
     MIN_CHARACTERS = 40
-    DEFAULT_THRESHOLD = 0.35
+    DEFAULT_THRESHOLD = 0.25
 
     def __init__(self, dataset=None, threshold=None):
         if not threshold:
