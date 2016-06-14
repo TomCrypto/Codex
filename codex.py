@@ -17,7 +17,7 @@ MARKERS = [
     _compiled_regex(r'^\s{2,}\S'), # indentation
 
     # TODO: need to explain what is going on here as it's not obvious
-    _compiled_regex(r'.{,2}\s*[=/\-\+\|<\{\}\[\](\)~`_\^;#]+\s*.{,2}'),  # generic symbol capture
+    _compiled_regex(r'.{,2}\s*[=/\-\+\|<\{\}\[\](\)~`_\^#]+\s*.{,2}'),  # generic symbol capture
 
     # C preprocessor markers
 
@@ -32,7 +32,7 @@ MARKERS = [
     _compiled_regex(r'^\s*#\s*pragma(.*?)$'),
 
     # C markers
-    
+
     # TODO
     _compiled_regex(r'/\*(.*?)\*/'),
 
@@ -142,10 +142,8 @@ MARKERS = [
 
     # JSON markers
 
-    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*\['),
-    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*\[]'),
-    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*{'),
-    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*{}'),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*\[(.*?)\]'),
+    _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*{(.*?)\}'),
     _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*[\.\-\deE]+\s*(,|}|\])'),
     _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*"[^"]*"\s*(,|}|\])'),
     _compiled_regex(r'(,|{|\[)?\s*"[^"]*"\s*:\s*true\s*(,|}|\])'),
@@ -300,7 +298,7 @@ class Language(enum.Enum):
 
 class Classifier:
     MIN_CHARACTERS = 40
-    DEFAULT_THRESHOLD = 0.25
+    DEFAULT_THRESHOLD = 0.35
 
     def __init__(self, dataset=None, threshold=None):
         if not threshold:
@@ -460,6 +458,9 @@ def _test(classifier, test_path):
     for folder, files in _load_dataset(test_path).items():
         tally = {}
 
+        if len(files) == 0:
+            continue
+
         for path in files:
             with open(path, 'r', encoding='utf-8', errors='ignore') as f:
                 result = classifier.classify(text = ''.join(f.readlines()))
@@ -477,13 +478,20 @@ def _test(classifier, test_path):
         accuracy = tally[folder_lang] * 100
         del tally[folder_lang]  # forget it
 
-        closest = max(tally, key=tally.get)
-        closest_lang = tally[closest] * 100
+        if len(tally) == 0:
+            closest_lang = None
+        else:
+            closest = max(tally, key=tally.get)
+            closest_lang = tally[closest] * 100
 
         print('| {0: <18} '.format(folder), end='')
         print('|  {0:5.1f}%  '.format(accuracy), end='')
-        print('| {0:4.1f}% '.format(tally[closest] * 100), end='')
-        print('{0: <12} |'.format(closest.value if closest else "None"))
+
+        if closest_lang is not None:
+            print('| {0:5.1f}% '.format(tally[closest] * 100), end='')
+            print('{0: <11} |'.format(closest.value if closest else "None"))
+        else:
+            print('| -                  |')
 
     print('+--------------------+----------+--------------------+')
 
