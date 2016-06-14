@@ -122,10 +122,11 @@ MARKERS = [
     _compiled_regex(r'\w+\s*<-\s*\w+'),
     _compiled_regex(r'\w+\s+\$\s+\w+'),
     _compiled_regex(r'\(\w+::\w+\)'),
+    _compiled_regex(r'\w+\s+::\s+\w+'),
     _compiled_regex(r"\w+'"),
     _compiled_regex(r'<\$>'),
-    _compiled_regex(r'=>'),
-    _compiled_regex(r'^\s*instance\s+\w+\s+\w+=>(.*?)where$'),
+    _compiled_regex(r'^\s*=>\s+(.*?)$'),
+    _compiled_regex(r'^\s*instance[^=>]+=>(.*?)where$'),
     _compiled_regex(r'^(.*?)=\s+do$', dotall=False),
     _compiled_regex(r'\+\+'),
     _compiled_regex(r'where$'),
@@ -194,14 +195,21 @@ MARKERS = [
     _compiled_regex(r'^\s*foreach\s*\((.*?)$', dotall=False),
     _compiled_regex(r'^\s*using(.*?)$'),
     _compiled_regex(r':\s*base\([^\)]+\)$'),
+    _compiled_regex(r'base\.\w+'),
+    _compiled_regex(r'ref\s+\w+'),
+    _compiled_regex(r'^\s*namespace\s+\w+(\.\w+)*\s*\{?$'),
+    _compiled_regex(r'string\.\w+'),
+    _compiled_regex(r'///'),
+    _compiled_regex(r'///\s*<\w+>$'),
+    _compiled_regex(r'\[\w+(\.\w+)*\(?[^\]]*\]\s*(public|protected|private|internal|\w+(\s+\w+)*\()(.*?);'),
 
     # C++ markers
 
-    _compiled_regex(r'^\s*template\s*<(.*?)>$'),
+    _compiled_regex(r'^\s*template\s*<[^>]>$'),
     _compiled_regex(r'size_t'),
-    _compiled_regex(r'\w*::\w+'),
-    _compiled_regex(r'\w+::\w+\((.*?)\);'),
-    _compiled_regex(r'\w+::\w+\([^\{]+\s*\{(.*?)\w+::\w+\('),
+    _compiled_regex(r'\w*\s*::\s*\w+'),
+    _compiled_regex(r'\w+\s*::\s*\w+\((.*?)\);'),
+    _compiled_regex(r'\w+\s*::\s*\w+\([^\{]+\s*\{(.*?)\w+::\w+\('),
     _compiled_regex(r'(std::)?cout\s*<<(.*?);'),
     _compiled_regex(r'(std::)?cin\s*>>(.*?);'),
     _compiled_regex(r'std::\w+'),
@@ -211,11 +219,37 @@ MARKERS = [
     _compiled_regex(r'dynamic_cast<[^>]>'),
     _compiled_regex(r'nullptr'),
     _compiled_regex(r'//(.*?)$'),
+    
+    _compiled_regex(r'switch\s*\((.*?)\);'),
+    _compiled_regex(r'&\w+'),
+    _compiled_regex(r'\w+&'),
+    _compiled_regex(r'const\s+\w+'),
+    _compiled_regex(r'\s[A-Z0-9_]+\((.*?);'),
 
     # Lua markers
 
     # TODO
     _compiled_regex(r'--\[\[(.*?)\]\]'),
+
+    # PHP markers
+    
+    _compiled_regex(r'<\?php(.*?)\?>'),
+    _compiled_regex(r'<\?php'),
+    _compiled_regex(r'\$\w+'),
+    _compiled_regex(r'\$\w+\s+=[^;]+;'),
+    _compiled_regex(r'new\s*\\\w+'),
+    _compiled_regex(r'\s+\.\s+'),
+
+    # Ruby markers
+
+    _compiled_regex(r'^\s*def\s*[^:]+$(.*?)end$'),
+    _compiled_regex(r'@[\.:\w+]'),
+    _compiled_regex(r'\s:\w+'),
+    _compiled_regex(r'#\{(.*?)\}'),
+    _compiled_regex(r'^\s*include\s+[\.\w+]+$'),
+    _compiled_regex(r'^\s*alias\s[\.\w]+\s+[\.\w]+(.*?)$'),
+    _compiled_regex(r'^\s*class\s+[\.\w+]+(\s*<\s*[\.\w]+(::[\.\w]+)*)?(.*?)$'),
+    _compiled_regex(r'^\s*module\s+[\.\w+]+\s*[\.\w]+(::[\.\w]+)*(.*?)$'),
 
 
 
@@ -230,7 +264,6 @@ MARKERS = [
     _compiled_regex(r'return\s+\w+;?$'),
     _compiled_regex(r'local\s+\w+\s*='),
     _compiled_regex(r'var\s+\w+\s*='),
-    _compiled_regex(r'\$\w+'),
     #_compiled_regex(r'\*\w+|\w+\*'),
     _compiled_regex(r'&&|\|\||>>|<<'),
     _compiled_regex(r'\+=|-=|/=|\*=|==|!='),
@@ -275,7 +308,6 @@ MARKERS = [
     #_compiled_regex(r'^\s*@\w+'),
     _compiled_regex(r'\(\)'),
     _compiled_regex(r'^\w*struct\s*(\w+\s*)?{'),
-    _compiled_regex(r'\w+:\w+\('),
 
     # TeX markers
 
