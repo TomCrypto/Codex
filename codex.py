@@ -19,6 +19,17 @@ MARKERS = [
     # TODO: need to explain what is going on here as it's not obvious
     _compiled_regex(r'.{,1}\s*[=/\-\+\|<\{\}\[\](\)~`_\^#]+\s*.{,1}'),  # generic symbol capture
 
+    _compiled_regex(r'&&|\|\||>>|<<'),
+    _compiled_regex(r'\+=|-=|/=|\*=|==|!='),
+    _compiled_regex(r'__\w+'),
+    _compiled_regex(r'{$'),
+    _compiled_regex(r'^\s*};?'),
+    _compiled_regex(r'if\s*\((.*?)\)\s*{'),
+    _compiled_regex(r'for\s*\((.*?)\)\s*{'),
+
+    _compiled_regex(r'0x\d+'),
+    _compiled_regex(r'=\s*0x\d+'),
+
     # C preprocessor markers
 
     _compiled_regex(r'^\s*#\s*include\s+("|<)[^">]+("|>)$'),
@@ -63,20 +74,18 @@ MARKERS = [
     # Python markers
 
     _compiled_regex(r'^(\s*from\s+[\.\w]+)?\s*import\s+[\*\.,\w]+(,\s*[\*\.,\w]+)*(\s+as\s+\w+)?$'),
-    _compiled_regex(r'^\s*def\s+\w+\((.*?):$'),
-    _compiled_regex(r'^\s*if\s(.*?):$(.*?)(^\s*else:)?$'),
-    _compiled_regex(r'^\s*if\s(.*?):$(.*?)(^\s*elif:)?$'),
+    _compiled_regex(r'^\s*def\s+\w+\((.*?):$', dotall=False),
+    _compiled_regex(r'^\s*if\s(.*?):$(.*?)(^\s*else:)?$', dotall=False),
+    _compiled_regex(r'^\s*if\s(.*?):$(.*?)(^\s*elif:)?$', dotall=False),
     _compiled_regex(r'^\s*try:$(.*?)^\s*except(.*?):'),
     _compiled_regex(r'True|False'),
-    _compiled_regex(r'==\s+(True|False)'),
+    _compiled_regex(r'==\s*(True|False)'),
     _compiled_regex(r'is\s+(None|True|False)'),
-    _compiled_regex(r'if\s+(\S*?)\s+in'),
-    _compiled_regex(r'^\s*return$'),
-    _compiled_regex(r'^\s*return\s+\w+(,\s+\w+)*$'),
+    _compiled_regex(r'^\s*if\s+(.*?)\s+in[^:\n]+:$', dotall=False),
     _compiled_regex(r'^\s*pass$'),
-    _compiled_regex(r'print\((.*?)\)$'),
+    _compiled_regex(r'print\((.*?)\)$', dotall=False),
     _compiled_regex(r'^\s*for\s+\w+\s+in\s+(.*?):$'),
-    _compiled_regex(r'^\s*class\s+\w+\s*(\([.\w]+\))?:$'),
+    _compiled_regex(r'^\s*class\s+\w+\s*(\([.\w]+\))?:$', dotall=False),
     _compiled_regex(r'^\s*@(staticmethod|classmethod|property)$'),
     _compiled_regex(r'__repr__'),
     _compiled_regex(r'"(.*?)"\s+%\s+(.*?)$', dotall=False),
@@ -107,6 +116,7 @@ MARKERS = [
     _compiled_regex(r'subprocess\.\w+'),
     _compiled_regex(r'^\s*if\s+__name__\s*=\s*"__main__"\s*:$'),
     _compiled_regex(r"^\s*if\s+__name__\s*=\s*'__main__'\s*:$"),
+    _compiled_regex(r'self\.\w+(\.\w+)*\((.*?)\)'),
 
     # Haskell markers
 
@@ -180,7 +190,7 @@ MARKERS = [
     _compiled_regex(r'\w+\.get(.*?);'),
     _compiled_regex(r'\w+:\s*function\s*\((.*?)},?'),
     _compiled_regex(r'this\.\w+'),
-    _compiled_regex(r'var\s+\w+(\s*,\s*\w+)*\s*=(.*?);$'),
+    _compiled_regex(r'var\s+\w+(\s*,\s*\w+)*\s*=(.*?);$', dotall=False),
     _compiled_regex(r'[\.\w+]+\s*===\s*[\.\w+]+'),
     _compiled_regex(r'require\s*\((.*?)\);?'),
     _compiled_regex(r'undefined'),
@@ -196,13 +206,17 @@ MARKERS = [
     _compiled_regex(r':\s*base\([^\)]+\)$'),
     _compiled_regex(r'base\.\w+'),
     _compiled_regex(r'ref\s+\w+'),
-    _compiled_regex(r'^\s*namespace\s+\w+(\.\w+)*\s*\{?$'),
+    _compiled_regex(r'^\s*namespace\s+\w+(\.\w+)+\s*\{(.*?)\};(.*?)$'),
     _compiled_regex(r'string\.\w+'),
     _compiled_regex(r'///'),
     _compiled_regex(r'///\s*<\w+>$'),
     _compiled_regex(r'\[\w+(\.\w+)*\(?[^\]]*\]\s*(public|protected|private|internal|\w+(\s+\w+)*\()(.*?)'),
     _compiled_regex(r'(sealed\s+)?class\s*\{(.*?)\}'),
     _compiled_regex(r'(sealed\s+)?class\s+\w+(\.\w+)*\s*:\s*\w+(\.\w+)*\s*\{(.*?)\}'),
+    _compiled_regex(r'get\s*{'),
+    _compiled_regex(r'set\s*{'),
+    _compiled_regex(r'private\s+get\s*{'),
+    _compiled_regex(r'private\s+set\s*{'),
 
     # C++ markers
 
@@ -214,6 +228,7 @@ MARKERS = [
     _compiled_regex(r'(std::)?cout\s*<<(.*?);'),
     _compiled_regex(r'(std::)?cin\s*>>(.*?);'),
     _compiled_regex(r'std::\w+'),
+    _compiled_regex(r'std::\w+\((.*?)\)'),
 
     _compiled_regex(r'static_assert\((.*?);'),
     _compiled_regex(r'static_cast<[^>]>'),
@@ -222,9 +237,8 @@ MARKERS = [
     _compiled_regex(r'//(.*?)$'),
     
     _compiled_regex(r'switch\s*\((.*?)\);'),
-    _compiled_regex(r'&\w+'),
+    _compiled_regex(r'&\(?\w+'),
     _compiled_regex(r'\w+&'),
-    _compiled_regex(r'const\s+\w+'),
     _compiled_regex(r'\s[A-Z0-9_]+\((.*?);'),
 
     _compiled_regex(r'\)\s*=\s*0;$'),
@@ -237,11 +251,24 @@ MARKERS = [
 
     _compiled_regex(r'^\s*class\s*\w+\s*:\s*public\s+\w+\s*\{(.*?)\)'),
     _compiled_regex(r'^\s*virtual\s+[^\(]+\((.*?)\)'),
+    _compiled_regex(r'^\w*struct\s*(\w+\s*)?{'),
+    _compiled_regex(r'\w+->\w+'),
+
+    _compiled_regex(r'^\s*namespace\s+\w+\s*\{(.*?)\};(.*?)$'),
+    _compiled_regex(r'const\s+static|static\s+const'),
+    _compiled_regex(r'typedef\s+(.*?)\s+\w+\s*;$'),
+    _compiled_regex(r'(i|u)(int)?\d+(_t)?'),
+    _compiled_regex(r'\*\w+->'),
+    _compiled_regex(r'(const\s+)?char\s*\*'),
+    _compiled_regex(r'int\s+\w+'),
+    _compiled_regex(r'void\s+\w+'),
+    _compiled_regex(r'auto'),
 
     # Lua markers
 
     # TODO
     _compiled_regex(r'--\[\[(.*?)\]\]'),
+    _compiled_regex(r'local\s+\w+\s*='),
 
     # PHP markers
     
@@ -251,6 +278,7 @@ MARKERS = [
     _compiled_regex(r'\$\w+\s+=[^;]+;'),
     _compiled_regex(r'new\s*\\\w+'),
     _compiled_regex(r'\s+\.\s+'),
+    _compiled_regex(r'this->'),
 
     # Ruby markers
 
@@ -279,62 +307,7 @@ MARKERS = [
     _compiled_regex(r'^\s*import\s+\w+(\.\w+)*;$'),
     _compiled_regex(r'(public|private|protected)\s+[^\{]*\{(.*?)\}$'),
     _compiled_regex(r'@Override'),
-
-
-
-
-
-
-
-
-
-
-
-
-    # TODO: everything below needs to be reviewed
-
-    _compiled_regex(r'^module'),
-    _compiled_regex(r'require\s+' + '(\'|")'),
-    #_compiled_regex(r'^import'),
-    _compiled_regex(r'local\s+\w+\s*='),
-    _compiled_regex(r'var\s+\w+\s*='),
-    #_compiled_regex(r'\*\w+|\w+\*'),
-    _compiled_regex(r'&&|\|\||>>|<<'),
-    _compiled_regex(r'\+=|-=|/=|\*=|==|!='),
-    #_compiled_regex(r'^\s*class'),
-    _compiled_regex(r'this->'),
-    _compiled_regex(r'\w+->\w+'),
-    #_compiled_regex(r'namespace\s*{'),
-    #_compiled_regex(r'operator::'),
-
-    _compiled_regex(r'__\w+'),
-
-    # C# markers
-    #_compiled_regex(r'public\s+[A-Z]+'),
-    #_compiled_regex(r'protected\s+[A-Z]+'),
-    #_compiled_regex(r'private\s+[A-Z]+'),
-    #_compiled_regex(r'internal\s+[A-Z]+'),
-    _compiled_regex(r'get\s*{'),
-    _compiled_regex(r'set\s*{'),
-    _compiled_regex(r'private\s+get\s*{'),
-    _compiled_regex(r'private\s+set\s*{'),
-    #_compiled_regex(r'sealed\s+class'),
-    #_compiled_regex(r'=>\s+{'),
     _compiled_regex(r'throw new \w+\((.*?)\);\s*$'),
-
-    # C/C++ markers
-    #_compiled_regex(r'\w+\s*\*\s*[a-zA-Z_]\w+'),
-    _compiled_regex(r'{$'),
-    _compiled_regex(r'^\s*}'),
-    _compiled_regex(r'^\s*};'),
-    _compiled_regex(r'if\s*\((.*?)\)\s*{'),
-    _compiled_regex(r'for\s*\((.*?)\)\s*{'),
-
-    # ???
-
-    #_compiled_regex(r'^\s*@\w+'),
-    #_compiled_regex(r'\(\)'),
-    _compiled_regex(r'^\w*struct\s*(\w+\s*)?{'),
 
     # TeX markers
 
@@ -342,20 +315,25 @@ MARKERS = [
     _compiled_regex(r'\\end'),
     _compiled_regex(r'\\\w+\s'),
     _compiled_regex(r'\\\w+({|\[)'),
+    _compiled_regex(r'\\begin\{document\}(.*?)\\end\{document\}'),
+    _compiled_regex(r'\\usepackage(\[[^\]]*\])?\{(.*?)\}'),
 ]
 
 
 SPECIAL = {
-    _compiled_regex(r'<!--(.*?)-->'):    (False, '<!-- -->'),
-    _compiled_regex(r'"""(.*?)"""'):     (False, '""" """'),
-    _compiled_regex(r"'''(.*?)'''"):     (False, "''' '''"),
-    _compiled_regex(r'/\*(.*?)\*/'):     (False, '/* */'),
-    _compiled_regex(r'//(.*?)$'):        (False, '// '),
-    _compiled_regex(r'-- (.*?)$'):       (False, '-- '),
-    _compiled_regex(r'--\[\[(.*?)\]\]'): (False, '--[[ ]]'),
-    _compiled_regex(r'\s# (.*?)$'):      (False, '# '),
-    _compiled_regex(r'\(\*(.*?)\*\)'):   (False, '(* *)'),
-    _compiled_regex(r'{(.*?)}'):         (True,  ' '),
+    _compiled_regex(r'<!--(.*?)-->'):               (False, '<!-- -->'),
+    _compiled_regex(r'"""(.*?)"""'):                (False, '""" """'),
+    _compiled_regex(r"'''(.*?)'''"):                (False, "''' '''"),
+    _compiled_regex(r'\[\[(.*?)\]\]'):              (False, '[[ ]]'),
+    _compiled_regex(r'/\*(.*?)\*/'):                (False, '/* */'),
+    _compiled_regex(r'//(.*?)$'):                   (False, '// '),
+    _compiled_regex(r'-- (.*?)$'):                  (False, '-- '),
+    _compiled_regex(r'--\[\[(.*?)\]\]'):            (False, '--[[ ]]'),
+    _compiled_regex(r'\s# (.*?)$'):                 (False, '# '),
+    _compiled_regex(r'\(\*(.*?)\*\)'):              (False, '(* *)'),
+    _compiled_regex(r'{(.*?)}'):                    (True,  ' '),
+    _compiled_regex(r'<script>(.*?)</script>'):     (False, '<script> </script>'),
+    _compiled_regex(r'<style>(.*?)</style>'):       (False, '<style> </style>'),
 }
 
 
@@ -379,8 +357,8 @@ class Language(enum.Enum):
 
 
 class Classifier:
-    MIN_CHARACTERS = 40
-    DEFAULT_THRESHOLD = 0.35
+    MIN_CHARACTERS = 70
+    DEFAULT_THRESHOLD = 0.3
 
     def __init__(self, dataset=None, threshold=None):
         if not threshold:
@@ -463,8 +441,8 @@ class Classifier:
                     self.vectors = np.append(self.vectors, [weights], axis=0)
                     self.classes = np.append(self.classes, [language], axis=0)
 
-        self.classif = svm.LinearSVC(class_weight='balanced', multi_class='crammer_singer')
-        self.classif.fit(self.vectors, self.classes)  # train the classifier on the dataset
+        self.classif = svm.LinearSVC(class_weight='balanced')
+        self.classif.fit(self.vectors, self.classes)
 
 
     def save(self, dataset):
