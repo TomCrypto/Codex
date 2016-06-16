@@ -44,22 +44,23 @@ Here "None" can be read as "anything that isn't source code", and should be inte
 
 | Language           | Accuracy | Closest Language   |
 | ------------------ | -------- | ------------------ |
-| Python             |   97.7%  |  0.8% PHP          |
-| None               |   93.9%  |  2.8% HTML         |
-| C++                |   64.9%  | 19.2% C            |
-| Ruby               |   86.8%  |  4.6% XML          |
-| Javascript         |   92.0%  |  2.5% JSON         |
-| Lua                |   89.4%  |  2.4% None         |
-| XML                |   94.1%  |  3.2% HTML         |
-| TeX                |   94.1%  |  3.9% None         |
-| HTML               |   93.9%  |  5.0% PHP          |
-| Haskell            |   97.5%  |  0.9% TeX          |
-| C#                 |   87.4%  |  5.7% Java         |
-| C                  |   93.8%  |  4.5% Java         |
-| PHP                |   93.3%  |  2.5% HTML         |
-| Java               |   90.1%  |  3.8% C++          |
-| JSON               |   87.5%  |  6.2% C#           |
-| Delphi             |   93.2%  |  3.9% Java         |
+| TeX                |   97.5%  |   2.5% None        |
+| Java               |   98.4%  |   0.7% C#          |
+| Javascript         |   94.2%  |   3.3% Lua         |
+| C                  |   99.4%  |   0.2% XML         |
+| HTML               |   91.1%  |   7.2% XML         |
+| PHP                |   95.8%  |   2.3% C           |
+| None               |   88.2%  |   6.5% TeX         |
+| JSON               |   96.9%  |   3.1% None        |
+| C#                 |   94.4%  |   3.8% Java        |
+| C++                |   82.3%  |  11.8% C           |
+| Python             |   97.2%  |   1.1% Ruby        |
+| Haskell            |   98.7%  |   0.4% Lua         |
+| Make               |   84.6%  |  14.7% None        |
+| Ruby               |   93.8%  |   2.9% Lua         |
+| XML                |   94.5%  |   2.7% HTML        |
+| Lua                |   93.1%  |   2.9% None        |
+| Delphi             |   97.4%  |   0.8% None        |
 
 TODO
 ----

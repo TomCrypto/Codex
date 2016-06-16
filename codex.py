@@ -93,7 +93,7 @@ MARKERS = [
     _compiled_regex(r'^\s*raise\s+\w+Error(.*?)$'),
     _compiled_regex(r'"""(.*?)"""'),
     _compiled_regex(r"'''(.*?)'''"),
-    _compiled_regex(r'\s# (.*?)$'),
+    _compiled_regex(r'\s*# (.*?)$'),
     _compiled_regex(r'^\s*import re$'),
     _compiled_regex(r're\.\w+'),
     _compiled_regex(r'^\s*import time$'),
@@ -311,12 +311,29 @@ MARKERS = [
 
     # TeX markers
 
-    _compiled_regex(r'\\begin'),
-    _compiled_regex(r'\\end'),
+    _compiled_regex(r'\\begin\{[^\}]+\}(.*?)\\end\{[^\}]+\}'),
+    _compiled_regex(r'\\begin\{[^\}]+\}(.*?)*$', dotall=False),
+    _compiled_regex(r'\\end\{[^\}]+\}(.*?)*$', dotall=False),
     _compiled_regex(r'\\\w+\s'),
     _compiled_regex(r'\\\w+({|\[)'),
-    _compiled_regex(r'\\begin\{document\}(.*?)\\end\{document\}'),
     _compiled_regex(r'\\usepackage(\[[^\]]*\])?\{(.*?)\}'),
+    _compiled_regex(r'^\s*%.{15,}$', dotall=False),
+
+    # Make markers
+
+    _compiled_regex(r'^\s*[^=\n]+\s*=\s*(.*?)$'),
+    _compiled_regex(r'^\s*[^=\n]+\s*:=\s*(.*?)$'),
+    _compiled_regex(r'^\s*[^=\n]+\s*\+=\s*(.*?)$'),
+    _compiled_regex(r'^\s*[^=\n]+\s*\?=\s*(.*?)$'),
+    _compiled_regex(r'\$@|\$\*|\$^|\$<'),
+    _compiled_regex(r'\$\((.*?)\)', dotall=False),
+    _compiled_regex(r'\w+\.\w{1,3}'),
+    _compiled_regex(r'^\s*ifeq[^\n]+(.*?)^\s*endif'),
+    _compiled_regex(r'^\s*ifneq[^\n]+(.*?)^\s*endif'),
+    _compiled_regex(r'\w*%\w*'),
+    _compiled_regex(r'-[^\W\d]+'),
+    _compiled_regex(r'PHONY\s*\+=(.*?)$'),
+    _compiled_regex(r'\.PHONY:(.*?)$'),
 ]
 
 
@@ -334,6 +351,7 @@ SPECIAL = {
     _compiled_regex(r'{(.*?)}'):                    (True,  ' '),
     _compiled_regex(r'<script>(.*?)</script>'):     (False, '<script> </script>'),
     _compiled_regex(r'<style>(.*?)</style>'):       (False, '<style> </style>'),
+    _compiled_regex(r'<code[^>]*>(.*?)</code>'):    (False, '<code> </code>'),
 }
 
 
@@ -354,10 +372,15 @@ class Language(enum.Enum):
     Html            = 'HTML'
     Tex             = 'TeX'
     Json            = 'JSON'
+    Make            = 'Make'
+    #Shell           = 'Shell'
+    #Go              = 'Go'
+    #Perl            = 'Perl'
+    #Lisp            = 'Lisp'
 
 
 class Classifier:
-    MIN_CHARACTERS = 70
+    MIN_LEN = 70
     DEFAULT_THRESHOLD = 0.3
 
     def __init__(self, dataset=None, threshold=None):
@@ -381,7 +404,7 @@ class Classifier:
             if self.threshold != threshold:
                 warnings.warn("Loaded dataset will override threshold parameter.", RuntimeWarning)
 
-        if (self.threshold <= 0.0) or (self.threshold >= 2.0):
+        if (self.threshold <= 0.0) or (self.threshold > 2.0):
             raise ValueError("Threshold value out of bounds.")
 
 
@@ -394,7 +417,7 @@ class Classifier:
 
 
     def is_comment(self, text):
-        if len(text) >= Classifier.MIN_CHARACTERS:
+        if len(text) >= Classifier.MIN_LEN:
             return sum(self.weight_vector(text)) < self.threshold
         else:
             return False
@@ -409,10 +432,7 @@ class Classifier:
                 return repl if self.is_comment(match.group(0)) else match.group(0)
             text = re.sub(pattern, repl if not ambiguous else repl_func, text)
 
-        if len(text) >= Classifier.MIN_CHARACTERS:
-            return self.weight_vector(text)
-        else:
-            return None
+        return self.weight_vector(text) if len(text) >= Classifier.MIN_LEN else None
 
 
     def classify(self, text):
@@ -421,10 +441,7 @@ class Classifier:
 
         weights = self.measure_weights(text)
 
-        if weights is None:
-            return None
-
-        if sum(weights) >= self.threshold:
+        if weights is not None and sum(weights) >= self.threshold:
             return Language(self.classif.predict([weights])[0])
         else:
             return None
@@ -477,8 +494,7 @@ of extension, and top-level files in the folder will be ignored.
 
 _classify_descr="""
 Script to classify a list of files given on the command line, or
-standard input. Each file will be classified and the result will
-be displayed.
+standard input. Each file will then be mapped to a language.
 """
 
 
